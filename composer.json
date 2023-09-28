@@ -1,0 +1,18 @@
+{
+  "name": "deferdie/acumen-logger-laravel",
+  "type": "laravel",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ferdie De Oliveira",
+      "email": "deferdie@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "AcumenLogger\\": "src/"
+    }
+  },
+  "require": {}
+}
