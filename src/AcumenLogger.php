@@ -45,8 +45,7 @@ class AcumenLogger
 		if (curl_errno($ch)) {
 			dd(curl_errno($ch));
 		}
-
-		dd($response);
+		
 		// Close cURL session
 		curl_close($ch);
 
