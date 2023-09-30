@@ -243,6 +243,11 @@ abstract class Logger
 		return url()->current();
 	}
 
+	/**
+	 * Returns core parameters
+	 * 
+	 * @return array
+	 */
 	public function getBaseProperties()
 	{
 		return [
