@@ -4,6 +4,7 @@ namespace AcumenLogger;
 
 use AcumenLogger\Loggers\ExceptionLogger;
 
+
 class AcumenLogger
 {
 	protected $projectId;
@@ -11,7 +12,18 @@ class AcumenLogger
 
 	public function __construct(\Exception $e)
 	{
+		$this->projectId=env('ACUMEN_PROJECT_ID');
+		$this->projectSecret=env('ACUMEN_PROJECT_SECRET');
+		
+		$this->checkEnvironmentVariablesAreSet();
 		$this->handleException($e);
+	}
+	
+	private function checkEnvironmentVariablesAreSet()
+	{
+		if(!isset($this->projectId) || !isset($this->projectSecret)) {
+			throw new \Exception('Please set the ACUMEN_PROJECT_ID and ACUMEN_PROJECT_SECRET');
+		}
 	}
 
 	public function handleException(\Exception $e)
@@ -27,6 +39,8 @@ class AcumenLogger
 		
 		$data = [
 			'exception' => $exception->report(),
+			'project_id'=> $this->projectId,
+			'project_secret'=> $this->projectSecret,
 		];
 
 		$ch = curl_init($url);
