@@ -2,8 +2,9 @@
 
 namespace AcumenLogger;
 
-use AcumenLogger\Exceptions\AcumenEnvironmentVariablesNotSet;
+use Illuminate\Support\Facades\Event;
 use AcumenLogger\Loggers\ExceptionLogger;
+use AcumenLogger\Exceptions\AcumenEnvironmentVariablesNotSet;
 
 
 class AcumenLogger
@@ -28,6 +29,10 @@ class AcumenLogger
 
         $this->projectId = env('ACUMEN_PROJECT_ID', false);
         $this->projectSecret = env('ACUMEN_PROJECT_SECRET', false);
+
+        Event::listen('*', function ($eventName, array $data) {
+            // \Log::info($eventName);
+        });
     }
 
     /**
@@ -37,7 +42,7 @@ class AcumenLogger
      */
     private function checkEnvironmentVariablesAreSet()
     {
-        if (env('ACUMEN_PROJECT_ID', false) || env('ACUMEN_PROJECT_SECRET', false)) {
+        if (env('ACUMEN_PROJECT_ID', false) === false || env('ACUMEN_PROJECT_SECRET', false) === false) {
             throw new AcumenEnvironmentVariablesNotSet;
         }
     }
@@ -57,7 +62,7 @@ class AcumenLogger
      */
     private function dispatch(ExceptionLogger $exception)
     {
-        $url = 'http://acumenlogs.com/beacon/logger/laravel';
+        $url = 'https://acumenlogs.com/api/beacon/logger/laravel';
 
         $data = [
             'exception' => $exception->report(),

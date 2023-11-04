@@ -90,7 +90,7 @@ abstract class Logger
      */
     public function setEnv()
     {
-        $this->env = isset($_SERVER['APP_ENV']) ? $_SERVER['APP_ENV'] : null;
+        $this->env = env('APP_ENV');
 
         return $this;
     }
@@ -114,7 +114,7 @@ abstract class Logger
      */
     public function setQueryParameters()
     {
-        $this->queryParameters = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
+        $this->queryParameters = request()->query();
 
         return $this;
     }
@@ -258,9 +258,11 @@ abstract class Logger
                 'http_user_agent' => $this->getHTTPUserAgent(),
                 'env' => $this->getEnv(),
                 'request_method' => $this->getHTTPMethod(),
-                'query_param' => $this->getQueryParameters(),
+                'query_params' => $this->getQueryParameters(),
                 'remote_address' => $this->getRemoteAddress(),
                 'referer' => $this->getReferer(),
+                'php_version' => phpversion(),
+                'laravel_version' => app()->version(),
             ];
         } catch (\Exception $e) {
             // dd($e);
