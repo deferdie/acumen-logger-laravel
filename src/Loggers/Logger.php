@@ -2,9 +2,6 @@
 
 namespace AcumenLogger\Loggers;
 
-use App\class_lib\Logging\CloudWatchReporter;
-use Illuminate\Support\Arr;
-
 abstract class Logger
 {
     private $url;
@@ -253,16 +250,20 @@ abstract class Logger
         try {
             return [
                 'path_name' => $this->getRequestUri(),
+                'reported_at' => time(),
                 'host' => $this->getHost(),
                 'port' => $this->getPort(),
                 'http_user_agent' => $this->getHTTPUserAgent(),
                 'env' => $this->getEnv(),
+                'app_debug' => env('APP_DEBUG'),
                 'request_method' => $this->getHTTPMethod(),
                 'query_params' => $this->getQueryParameters(),
                 'remote_address' => $this->getRemoteAddress(),
                 'referer' => $this->getReferer(),
                 'php_version' => phpversion(),
                 'laravel_version' => app()->version(),
+                'config_cached' => file_exists(base_path('bootstrap/cache/config.php')),
+                'maintainance_mode' => app()->isDownForMaintenance()
             ];
         } catch (\Exception $e) {
             // dd($e);

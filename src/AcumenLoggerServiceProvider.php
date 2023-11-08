@@ -3,8 +3,10 @@
 namespace AcumenLogger;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 
-class ClientExceptionLoggerServiceProvider extends ServiceProvider
+class AcumenLoggerServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
@@ -13,6 +15,32 @@ class ClientExceptionLoggerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        DB::listen(function ($query) {
+        });
+
+        Event::listen('*', function ($event, $eventData) {
+
+            $acumenLogger = app(AcumenLogger::class);
+
+            $acumenLogger->addEvent($event);
+
+            foreach ($eventData as $data) {
+                if ($event === 'Illuminate\Database\Events\QueryExecuted') {
+                    $logData = [
+                        'time' => $data->time,
+                        'query' => $data->sql,
+                        'connectionName' => $data->connectionName,
+                        'memory' => number_format(memory_get_usage()),
+                    ];
+
+                    $acumenLogger->setSqlQuery($logData);
+                }
+
+                if ($event === 'Illuminate\Log\Events\MessageLogged') {
+                    $acumenLogger->addLogEntry($data);
+                }
+            }
+        });
     }
 
     /**
@@ -22,7 +50,8 @@ class ClientExceptionLoggerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('acumenlogs-logger', function () {
+
+        $this->app->singleton(AcumenLogger::class, static function ($app) {
             return new AcumenLogger();
         });
     }
