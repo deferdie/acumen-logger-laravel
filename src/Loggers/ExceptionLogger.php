@@ -25,7 +25,7 @@ class ExceptionLogger extends Logger
             $this->message = $e->getMessage();
             $this->line = $e->getLine();
             $this->exception_name = get_class($e);
-            $this->php_severity = $e->getSeverity();
+            $this->php_severity = method_exists($e, 'getSeverity') ?  $e->getSeverity() : null;
             $this->exception_namespace = (new ReflectionClass($e))->getNamespaceName();
             $this->setTrace($e->getTrace());
         } catch (\Exception $e) {
@@ -82,7 +82,6 @@ class ExceptionLogger extends Logger
     public function report()
     {
         try {
-            dd('asdasd');
             return array_merge($this->getBaseProperties(), [
                 'exception_name' => $this->exception_name,
                 'status_code' => $this->statusCode,
