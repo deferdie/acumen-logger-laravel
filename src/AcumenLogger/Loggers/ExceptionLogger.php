@@ -2,7 +2,7 @@
 
 namespace AcumenLogger\Loggers;
 
-use AcumenLogger\AcumenPerformance;
+use AcumenLogger\Performance;
 use COM;
 use Exception;
 use ReflectionClass;

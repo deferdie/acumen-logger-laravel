@@ -5,7 +5,7 @@ namespace AcumenLogger;
 use COM;
 use Exception;
 
-class AcumenPerformance
+class Performance
 {
     /**
      * Returns the current server load time
