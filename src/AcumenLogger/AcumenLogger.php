@@ -1,6 +1,6 @@
 <?php
 
-namespace AcumenLogger;
+namespace AcumenLogger\AcumenLogger;
 
 use Illuminate\Support\Facades\Event;
 use AcumenLogger\Loggers\ExceptionLogger;
