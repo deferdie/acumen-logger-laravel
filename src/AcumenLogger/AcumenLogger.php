@@ -2,12 +2,9 @@
 
 namespace AcumenLogger;
 
-use Illuminate\Support\Facades\Event;
+use Exception;
 use AcumenLogger\Loggers\ExceptionLogger;
 use AcumenLogger\Exceptions\AcumenEnvironmentVariablesNotSet;
-use DateTime;
-use Exception;
-use Illuminate\Support\Facades\DB;
 
 class AcumenLogger
 {
@@ -95,8 +92,19 @@ class AcumenLogger
         array_push($this->events, $event);
     }
 
+    /**
+     * Handle the exception.
+     *
+     * @param \Exception $e
+     * @return void
+     */
     public function handleException($e)
     {
+        // Check if the exception should be ignored.
+        if (in_array(get_class($e), config('acumen.ignore_exceptions'))) {
+            return;
+        }
+
         $exception = new ExceptionLogger($e);
 
         $this->dispatch($exception);
@@ -133,13 +141,12 @@ class AcumenLogger
 
             // Check for errors
             if (curl_errno($ch)) {
-                dd(curl_errno($ch));
+                // curl_errno($ch);
             }
 
             // Close cURL session
             curl_close($ch);
         } catch (Exception $e) {
-            dd($e);
         }
     }
 }
