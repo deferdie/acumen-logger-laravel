@@ -15,11 +15,7 @@ class AcumenLoggerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        DB::listen(function ($query) {
-        });
-
         Event::listen('*', function ($event, $eventData) {
-
             $acumenLogger = app(AcumenLogger::class);
 
             $acumenLogger->addEvent($event);
@@ -41,6 +37,10 @@ class AcumenLoggerServiceProvider extends ServiceProvider
                 }
             }
         });
+
+        $this->publishes([
+            __DIR__ . '/config/acumen.php' => config_path('acumen.php'),
+        ]);
     }
 
     /**
