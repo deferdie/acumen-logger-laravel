@@ -20,6 +20,11 @@ abstract class Logger
         $this->parseException();
     }
 
+    /**
+     * Parese the exception.
+     *
+     * @return void
+     */
     private function parseException()
     {
         $this->setRequestUri()

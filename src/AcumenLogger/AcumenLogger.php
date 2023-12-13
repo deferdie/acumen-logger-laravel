@@ -48,6 +48,7 @@ class AcumenLogger
     /**
      * Check if the projects env variables are set.
      *
+     * @throws \AcumenLogger\Exceptions\AcumenEnvironmentVariablesNotSet
      * @return void
      */
     private function checkEnvironmentVariablesAreSet()

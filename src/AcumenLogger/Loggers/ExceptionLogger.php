@@ -2,7 +2,6 @@
 
 namespace AcumenLogger\Loggers;
 
-use AcumenLogger\Performance;
 use ReflectionClass;
 use Ramsey\Uuid\Uuid;
 
@@ -30,7 +29,6 @@ class ExceptionLogger extends Logger
             $this->exception_namespace = (new ReflectionClass($e))->getNamespaceName();
             $this->setTrace($e->getTrace());
         } catch (\Exception $e) {
-            // dd($e);
         }
     }
 
