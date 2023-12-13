@@ -29,7 +29,7 @@ class AcumenLoggerServiceProvider extends ServiceProvider
                         'memory' => number_format(memory_get_usage()),
                     ];
 
-                    $acumenLogger->setSqlQuery($logData);
+                    $acumenLogger->addSqlQuery($logData);
                 }
 
                 if ($event === 'Illuminate\Log\Events\MessageLogged') {

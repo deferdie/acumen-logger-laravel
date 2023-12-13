@@ -1,11 +1,20 @@
 {
   "name": "deferdie/acumen-logger-laravel",
   "type": "laravel",
+  "description": "A Laravel package for logging to Acumen Logger",
   "license": "MIT",
+  "keywords": [
+    "laravel",
+    "acumen",
+    "logger"
+  ],
+  "homepage": "https://acumenlogs.com",
   "authors": [
     {
       "name": "Ferdie De Oliveira",
-      "email": "deferdie@gmail.com"
+      "email": "deferdie@gmail.com",
+      "homepage": "https://acumenlogs.com",
+      "role": "Developer"
     }
   ],
   "minimum-stability": "dev",
@@ -15,6 +24,13 @@
     }
   },
   "require": {
-    "ramsey/uuid": "5.x-dev"
+    "ramsey/uuid": "5.x-dev",
+    "guzzlehttp/guzzle": "^7.2",
+    "illuminate/support": "~5.5 || ~6.0 || ~7.0 || ^8.0 || ^9.0 || ^10.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0@dev",
+    "phpoption/phpoption": "^1.9@dev",
+    "vlucas/phpdotenv": "^5.6@dev"
   }
 }

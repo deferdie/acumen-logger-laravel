@@ -1,2 +1,9 @@
 vendor
 .idea/
+.phpunit.result.cache
+.phpstorm.meta.php
+.phpunit.cache
+phpunit.xml.bak
+.env
+phpunit.xml
+composer.lock

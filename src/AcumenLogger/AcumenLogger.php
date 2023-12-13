@@ -5,6 +5,7 @@ namespace AcumenLogger;
 use Exception;
 use AcumenLogger\Loggers\ExceptionLogger;
 use AcumenLogger\Exceptions\AcumenEnvironmentVariablesNotSet;
+use Illuminate\Support\Facades\Config;
 
 class AcumenLogger
 {
@@ -24,18 +25,31 @@ class AcumenLogger
 
     /**
      * The sql queries for the current request.
+     *
+     * @var array
      */
     public $sqlQueries = [];
 
     /**
      * The logs for the current request.
+     *
+     * @var array
      */
     public $logs = [];
 
     /**
      * The events for the current app.
+     *
+     * @var array
      */
     public $events = [];
+
+    /**
+     * Should the log be dispatched.
+     *
+     * @var bool
+     */
+    public $shouldDispatch = true;
 
     public function __construct()
     {
@@ -63,7 +77,7 @@ class AcumenLogger
      *
      * @return void
      */
-    public function setSqlQuery(array $query)
+    public function addSqlQuery(array $query)
     {
         array_push($this->sqlQueries, $query);
     }
@@ -119,9 +133,11 @@ class AcumenLogger
      */
     private function dispatch(ExceptionLogger $exception)
     {
-        try {
-            $url = 'https://acumenlogs.com/api/beacon/logger/laravel';
+        if (!$this->shouldDispatch) {
+            return;
+        }
 
+        try {
             $data = [
                 'project_id' => $this->projectId,
                 'project_secret' => $this->projectSecret,
@@ -131,22 +147,12 @@ class AcumenLogger
                 'logs' => json_encode($this->logs),
             ];
 
-            $ch = curl_init($url);
+            // Post the data via guzzle
+            $client = new \GuzzleHttp\Client();
+            $response = $client->post('https://acumenlogs.com/api/beacon/logger/laravel', [
+                'form_params' => $data
+            ]);
 
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-            $response = curl_exec($ch);
-
-            // Check for errors
-            if (curl_errno($ch)) {
-                // curl_errno($ch);
-            }
-
-            // Close cURL session
-            curl_close($ch);
         } catch (Exception $e) {
         }
     }
