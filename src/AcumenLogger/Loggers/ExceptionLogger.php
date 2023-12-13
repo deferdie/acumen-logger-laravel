@@ -3,9 +3,8 @@
 namespace AcumenLogger\Loggers;
 
 use AcumenLogger\Performance;
-use COM;
-use Exception;
 use ReflectionClass;
+use Ramsey\Uuid\Uuid;
 
 class ExceptionLogger extends Logger
 {
@@ -16,9 +15,11 @@ class ExceptionLogger extends Logger
     private $exception_name;
     private $php_severity;
     private $exception_namespace;
+    private $exception;
 
     public function __construct($e)
     {
+        $this->exception = $e;
         try {
             parent::__construct();
             $this->statusCode = $e->getCode();
@@ -33,6 +34,12 @@ class ExceptionLogger extends Logger
         }
     }
 
+    /**
+     * Parse the trace and get the file data.
+     *
+     * @param array $traces
+     * @return void
+     */
     private function setTrace($traces = [])
     {
         $trace = [];
@@ -49,38 +56,44 @@ class ExceptionLogger extends Logger
         $this->trace = $trace;
     }
 
-    public function getServerLoadTime()
+    /**
+     * Get the user id if the user is authenticated
+     *
+     * @return int|null
+     */
+    private function getUserId()
     {
-
-        try {
-            if (stristr(PHP_OS, 'win')) {
-
-                $wmi = new COM("Winmgmts://");
-                $server = $wmi->execquery("SELECT LoadPercentage FROM Win32_Processor");
-
-                $cpu_num = 0;
-                $load_total = 0;
-
-                foreach ($server as $cpu) {
-                    $cpu_num++;
-                    $load_total += $cpu->loadpercentage;
-                }
-
-                $load = round($load_total / $cpu_num);
-            } else {
-
-                $sys_load = sys_getloadavg();
-                $load = $sys_load[0];
-            }
-
-            return (int) $load;
-        } catch (Exception $e) {
-            return 0;
+        if (auth()->check()) {
+            return auth()->user()->id;
         }
+
+        return null;
     }
 
+    /**
+     * Get the HTTP status code based on the current exception.
+     *
+     * @return array
+     */
+    private function getStatusCode()
+    {
+        if (method_exists($this->exception, 'getStatusCode')) {
+            return $this->exception->getStatusCode();
+        }
+
+        return 500;
+    }
+
+
+    /**
+     * Report the exception.
+     *
+     * @return void
+     */
     public function report()
     {
+        $uuid = Uuid::uuid4();
+
         try {
             return array_merge($this->getBaseProperties(), [
                 'exception_name' => $this->exception_name,
@@ -95,7 +108,9 @@ class ExceptionLogger extends Logger
                 'route_data' => json_encode(request()->route()),
                 'authenticated' => auth()->check(),
                 'php_memory_useage' => memory_get_usage(),
-                'server_load' => $this->getServerLoadTime()
+                'user_id' => $this->getUserId(),
+                'request_id' => $uuid->toString(),
+                'http_status_code' => $uuid->getStatusCode(),
             ]);
         } catch (\Exception $e) {
             // dd($e);

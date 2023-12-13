@@ -14,5 +14,7 @@
       "AcumenLogger\\": "src/AcumenLogger"
     }
   },
-  "require": {}
+  "require": {
+    "ramsey/uuid": "5.x-dev"
+  }
 }
