@@ -3,7 +3,7 @@
 namespace AcumenLogger\Loggers;
 
 use ReflectionClass;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 
 class ExceptionLogger extends Logger
 {
@@ -90,8 +90,6 @@ class ExceptionLogger extends Logger
      */
     public function report()
     {
-        $uuid = Uuid::uuid4();
-
         try {
             return array_merge($this->getBaseProperties(), [
                 'exception_name' => $this->exception_name,
@@ -107,7 +105,7 @@ class ExceptionLogger extends Logger
                 'authenticated' => auth()->check(),
                 'php_memory_useage' => memory_get_usage(),
                 'user_id' => $this->getUserId(),
-                'request_id' => $uuid->toString(),
+                'request_id' => Str::uuid(),
                 'http_status_code' => $uuid->getStatusCode(),
             ]);
         } catch (\Exception $e) {
