@@ -51,6 +51,11 @@ class AcumenLogger
      */
     public $shouldDispatch = true;
 
+    /**
+     * The reported exception.
+     */
+    public $exception = null;
+
     public function __construct()
     {
         $this->checkEnvironmentVariablesAreSet();
@@ -120,9 +125,9 @@ class AcumenLogger
             return;
         }
 
-        $exception = new ExceptionLogger($e);
+        $this->exception = new ExceptionLogger($e);
 
-        $this->dispatch($exception);
+        $this->dispatch($this->exception);
     }
 
     /**
@@ -131,7 +136,7 @@ class AcumenLogger
      * @param \AcumenLogger\Loggers\ExceptionLogger $exception
      * @return void
      */
-    private function dispatch(ExceptionLogger $exception)
+    public function dispatch(ExceptionLogger $exception)
     {
         if (!$this->shouldDispatch) {
             return;
@@ -152,8 +157,35 @@ class AcumenLogger
             $response = $client->post('https://acumenlogs.com/api/beacon/logger/laravel', [
                 'form_params' => $data
             ]);
-
         } catch (Exception $e) {
+        }
+    }
+
+    /**
+     * Dispatches all the logs.
+     *
+     * @return void
+     */
+    public function reportLogs()
+    {
+        if (!$this->shouldDispatch) {
+            return;
+        }
+
+        try {
+            $data = [
+                'project_id' => $this->projectId,
+                'project_secret' => $this->projectSecret,
+                'logs' => json_encode($this->logs),
+            ];
+
+            // Post the data via guzzle
+            $client = new \GuzzleHttp\Client();
+            $response = $client->post('https://acumenlogs.com/api/beacon/logger/laravel/logs', [
+                'form_params' => $data
+            ]);
+        } catch (Exception $e) {
+            // dd($e);
         }
     }
 }

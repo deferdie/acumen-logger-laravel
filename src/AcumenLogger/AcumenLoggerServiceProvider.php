@@ -16,6 +16,7 @@ class AcumenLoggerServiceProvider extends ServiceProvider
     public function boot()
     {
         Event::listen('*', function ($event, $eventData) {
+            /** @var AcumenLogger */
             $acumenLogger = app(AcumenLogger::class);
 
             $acumenLogger->addEvent($event);
@@ -34,6 +35,12 @@ class AcumenLoggerServiceProvider extends ServiceProvider
 
                 if ($event === 'Illuminate\Log\Events\MessageLogged') {
                     $acumenLogger->addLogEntry($data);
+                }
+
+                if (\Illuminate\Foundation\Http\Events\RequestHandled::class === $event) {
+                    if (is_null($acumenLogger->exception) && count($acumenLogger->logs) > 0) {
+                        $acumenLogger->reportLogs();
+                    }
                 }
             }
         });
