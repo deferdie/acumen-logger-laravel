@@ -45,7 +45,12 @@ class ExceptionLogger extends Logger
         foreach ($traces as $traceToCheck) {
             $file = new \SplFileObject($traceToCheck['file'], 'r');
             $file->seek(PHP_INT_MAX);
-            $lines = new \LimitIterator($file, $traceToCheck['line'] - 15, 25);
+            $lineOffset = $traceToCheck['line'] - 15;
+            if ($lineOffset < 0) {
+                $lineOffset = 0;
+            }
+
+            $lines = new \LimitIterator($file, $lineOffset, 25);
             $arr = iterator_to_array($lines);
             $traceToCheck['file_data'] = $arr;
             array_push($trace, $traceToCheck);
